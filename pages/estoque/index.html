@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque - ERP Restaurant</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="../../assets/css/components/navbar.css">
+    <link rel="stylesheet" href="../../assets/css/components/cards.css">
+    <link rel="stylesheet" href="../../assets/css/components/modals.css">
+    <link rel="stylesheet" href="../../assets/css/components/tables.css">
+    <style>
+        .main-content {
+            margin-left: 260px;
+            margin-top: 64px;
+            padding: 32px;
+            min-height: calc(100vh - 64px);
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stock-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1440px) {
+            .stock-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .stock-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stock-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">ERP Restaurant</div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../dashboard/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="../pdv/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span>PDV</span>
+            </a>
+            <a href="../mesas/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span>Mesas</span>
+            </a>
+            <a href="../produtos/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <span>Produtos</span>
+            </a>
+            <a href="../estoque/index.html" class="sidebar-nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <span>Estoque</span>
+            </a>
+            <a href="../financeiro/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Financeiro</span>
+            </a>
+            <a href="../relatorios/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Relatórios</span>
+            </a>
+            <a href="../configuracoes/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Configurações</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="userAvatar">AU</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="userName">Admin User</div>
+                    <div class="sidebar-user-role">Administrador</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <button class="navbar-menu-btn" id="menuBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="navbar-search">
+                <div class="navbar-search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" placeholder="Pesquisar...">
+            </div>
+        </div>
+
+        <div class="navbar-right">
+            <button class="navbar-btn" id="themeToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            <button class="navbar-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span class="navbar-btn-badge"></span>
+            </button>
+            <div class="navbar-divider"></div>
+            <div class="navbar-user">
+                <div class="navbar-user-avatar" id="navUserAvatar">AU</div>
+                <div class="navbar-user-name" id="navUserName">Admin User</div>
+                <div class="navbar-user-chevron">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+            <button class="navbar-btn" id="logoutBtn" title="Sair">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Estoque</h1>
+            <button class="btn btn-primary" id="addMovementBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nova Movimentação
+            </button>
+        </div>
+
+        <!-- Stock Stats -->
+        <div class="stock-stats">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card-value">156</div>
+                <div class="stat-card-label">Total de Produtos</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card-value">12</div>
+                <div class="stat-card-label">Baixo Estoque</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card-value">3</div>
+                <div class="stat-card-label">Sem Estoque</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon success">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card-value">R$ 12.450,00</div>
+                <div class="stat-card-label">Valor Total</div>
+            </div>
+        </div>
+
+        <!-- Movements Table -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <h3 class="card-title">Movimentações</h3>
+                <div class="table-actions">
+                    <div class="table-actions-left">
+                        <div class="table-filter">
+                            <select id="movementFilter">
+                                <option value="">Todas Movimentações</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="saida">Saídas</option>
+                            </select>
+                            <div class="table-filter-chevron">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Tipo</th>
+                            <th>Quantidade</th>
+                            <th>Usuário</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movementsTableBody">
+                        <!-- Movements will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-pagination">
+                <div class="table-pagination-info">
+                    Mostrando 1-10 de 45 movimentações
+                </div>
+                <div class="table-pagination-controls">
+                    <button class="table-pagination-btn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button class="table-pagination-page active">1</button>
+                    <button class="table-pagination-page">2</button>
+                    <button class="table-pagination-page">3</button>
+                    <button class="table-pagination-page">4</button>
+                    <button class="table-pagination-page">5</button>
+                    <button class="table-pagination-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Movement Modal -->
+    <div class="modal-overlay" id="movementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Movimentação</h2>
+                <button class="modal-close" id="closeMovementModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="movementForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tipo</label>
+                            <select class="form-select" id="movementType" required>
+                                <option value="">Selecione...</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="saida">Saída</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Produto</label>
+                            <select class="form-select" id="movementProduct" required>
+                                <option value="">Selecione...</option>
+                                <option value="1">X-Burger</option>
+                                <option value="2">X-Salada</option>
+                                <option value="3">Coca-Cola 350ml</option>
+                                <option value="4">Batata Frita</option>
+                                <option value="5">Pudim</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Quantidade</label>
+                            <input type="number" class="form-input" id="movementQuantity" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data</label>
+                            <input type="date" class="form-input" id="movementDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observação</label>
+                        <textarea class="form-textarea" id="movementObservation" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelMovementBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveMovementBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../services/auth.js"></script>
+    <script src="../../services/storage.js"></script>
+    <script src="../../services/notifications.js"></script>
+    <script>
+        // Check authentication
+        if (!authService.isAuthenticated()) {
+            window.location.href = '../login/index.html';
+        }
+
+        // Load user info
+        const user = authService.getCurrentUser();
+        if (user) {
+            document.getElementById('userAvatar').textContent = user.avatar || 'AU';
+            document.getElementById('userName').textContent = user.name || 'Admin User';
+            document.getElementById('navUserAvatar').textContent = user.avatar || 'AU';
+            document.getElementById('navUserName').textContent = user.name || 'Admin User';
+        }
+
+        // Mock movements data
+        const movements = [
+            { id: 1, date: '2024-01-15', product: 'X-Burger', type: 'entrada', quantity: 50, user: 'Admin User', observation: 'Reposição de estoque' },
+            { id: 2, date: '2024-01-15', product: 'Coca-Cola 350ml', type: 'entrada', quantity: 100, user: 'Admin User', observation: 'Reposição de estoque' },
+            { id: 3, date: '2024-01-14', product: 'Batata Frita', type: 'saida', quantity: 20, user: 'Admin User', observation: 'Venda do dia' },
+            { id: 4, date: '2024-01-14', product: 'X-Salada', type: 'saida', quantity: 15, user: 'Admin User', observation: 'Venda do dia' },
+            { id: 5, date: '2024-01-13', product: 'Pudim', type: 'entrada', quantity: 30, user: 'Admin User', observation: 'Nova remessa' },
+            { id: 6, date: '2024-01-13', product: 'Suco de Laranja', type: 'entrada', quantity: 60, user: 'Admin User', observation: 'Reposição de estoque' },
+            { id: 7, date: '2024-01-12', product: 'Feijoada', type: 'saida', quantity: 10, user: 'Admin User', observation: 'Venda do dia' },
+            { id: 8, date: '2024-01-12', product: 'X-Bacon', type: 'saida', quantity: 25, user: 'Admin User', observation: 'Venda do dia' },
+            { id: 9, date: '2024-01-11', product: 'Água Mineral', type: 'entrada', quantity: 80, user: 'Admin User', observation: 'Reposição de estoque' },
+            { id: 10, date: '2024-01-11', product: 'Sorvete', type: 'saida', quantity: 5, user: 'Admin User', observation: 'Venda do dia' }
+        ];
+
+        // Render movements table
+        function renderMovements() {
+            const tbody = document.getElementById('movementsTableBody');
+            tbody.innerHTML = movements.map(movement => `
+                <tr>
+                    <td>${new Date(movement.date).toLocaleDateString('pt-BR')}</td>
+                    <td>${movement.product}</td>
+                    <td>
+                        <span class="table-cell-badge ${movement.type === 'entrada' ? 'success' : 'danger'}">
+                            ${movement.type === 'entrada' ? 'Entrada' : 'Saída'}
+                        </span>
+                    </td>
+                    <td>${movement.quantity}</td>
+                    <td>${movement.user}</td>
+                    <td>${movement.observation || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Modal functions
+        function openMovementModal() {
+            document.getElementById('movementModal').classList.add('open');
+            document.getElementById('movementForm').reset();
+            document.getElementById('movementDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeMovementModal() {
+            document.getElementById('movementModal').classList.remove('open');
+        }
+
+        // Event listeners
+        document.getElementById('addMovementBtn').addEventListener('click', openMovementModal);
+        document.getElementById('closeMovementModal').addEventListener('click', closeMovementModal);
+        document.getElementById('cancelMovementBtn').addEventListener('click', closeMovementModal);
+
+        document.getElementById('saveMovementBtn').addEventListener('click', () => {
+            const type = document.getElementById('movementType').value;
+            const product = document.getElementById('movementProduct').value;
+            const quantity = parseInt(document.getElementById('movementQuantity').value);
+            const date = document.getElementById('movementDate').value;
+            const observation = document.getElementById('movementObservation').value;
+
+            const productName = document.getElementById('movementProduct').options[document.getElementById('movementProduct').selectedIndex].text;
+
+            const newMovement = {
+                id: movements.length + 1,
+                date,
+                product: productName,
+                type,
+                quantity,
+                user: user.name || 'Admin User',
+                observation
+            };
+
+            movements.unshift(newMovement);
+            renderMovements();
+            notificationsService.success('Movimentação registrada com sucesso!');
+            closeMovementModal();
+        });
+
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const menuBtn = document.getElementById('menuBtn');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        menuBtn.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('open');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = storageService.get('theme', 'dark');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            storageService.set('theme', newTheme);
+            location.reload();
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await authService.logout();
+            window.location.href = '../login/index.html';
+        });
+
+        // Initial render
+        renderMovements();
+    </script>
+</body>
+</html>

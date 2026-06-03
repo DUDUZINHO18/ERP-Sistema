@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesas - ERP Restaurant</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="../../assets/css/components/navbar.css">
+    <link rel="stylesheet" href="../../assets/css/components/cards.css">
+    <link rel="stylesheet" href="../../assets/css/components/modals.css">
+    <style>
+        .main-content {
+            margin-left: 260px;
+            margin-top: 64px;
+            padding: 32px;
+            min-height: calc(100vh - 64px);
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tables-legend {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.free {
+            background: var(--status-free);
+        }
+
+        .legend-color.occupied {
+            background: var(--status-occupied);
+        }
+
+        .legend-color.reserved {
+            background: var(--status-reserved);
+        }
+
+        .legend-color.cleaning {
+            background: var(--status-cleaning);
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .table-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .table-card.free {
+            border-color: var(--status-free);
+        }
+
+        .table-card.occupied {
+            border-color: var(--status-occupied);
+        }
+
+        .table-card.reserved {
+            border-color: var(--status-reserved);
+        }
+
+        .table-card.cleaning {
+            border-color: var(--status-cleaning);
+        }
+
+        .table-card-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .table-card.free .table-card-icon {
+            background: var(--status-free);
+        }
+
+        .table-card.occupied .table-card-icon {
+            background: var(--status-occupied);
+        }
+
+        .table-card.reserved .table-card-icon {
+            background: var(--status-reserved);
+        }
+
+        .table-card.cleaning .table-card-icon {
+            background: var(--status-cleaning);
+        }
+
+        .table-card-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .table-card-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .table-card-info {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .table-card-seats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .table-card-seats svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .tables-legend {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tables-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 16px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">ERP Restaurant</div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../dashboard/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="../pdv/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span>PDV</span>
+            </a>
+            <a href="../mesas/index.html" class="sidebar-nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span>Mesas</span>
+            </a>
+            <a href="../produtos/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <span>Produtos</span>
+            </a>
+            <a href="../estoque/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <span>Estoque</span>
+            </a>
+            <a href="../financeiro/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Financeiro</span>
+            </a>
+            <a href="../relatorios/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Relatórios</span>
+            </a>
+            <a href="../configuracoes/index.html" class="sidebar-nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Configurações</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="userAvatar">AU</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="userName">Admin User</div>
+                    <div class="sidebar-user-role">Administrador</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <button class="navbar-menu-btn" id="menuBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="navbar-search">
+                <div class="navbar-search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" placeholder="Pesquisar...">
+            </div>
+        </div>
+
+        <div class="navbar-right">
+            <button class="navbar-btn" id="themeToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            <button class="navbar-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span class="navbar-btn-badge"></span>
+            </button>
+            <div class="navbar-divider"></div>
+            <div class="navbar-user">
+                <div class="navbar-user-avatar" id="navUserAvatar">AU</div>
+                <div class="navbar-user-name" id="navUserName">Admin User</div>
+                <div class="navbar-user-chevron">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+            <button class="navbar-btn" id="logoutBtn" title="Sair">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Mesas</h1>
+            <button class="btn btn-primary" id="addTableBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nova Mesa
+            </button>
+        </div>
+
+        <!-- Legend -->
+        <div class="tables-legend">
+            <div class="legend-item">
+                <div class="legend-color free"></div>
+                <span>Livre</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color occupied"></div>
+                <span>Ocupada</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color reserved"></div>
+                <span>Reservada</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color cleaning"></div>
+                <span>Limpeza</span>
+            </div>
+        </div>
+
+        <!-- Tables Grid -->
+        <div class="tables-grid" id="tablesGrid">
+            <!-- Tables will be loaded dynamically -->
+        </div>
+    </main>
+
+    <!-- Table Modal -->
+    <div class="modal-overlay" id="tableModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nova Mesa</h2>
+                <button class="modal-close" id="closeTableModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tableForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Número</label>
+                            <input type="number" class="form-input" id="tableNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Lugares</label>
+                            <input type="number" class="form-input" id="tableSeats" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="tableStatus">
+                            <option value="free">Livre</option>
+                            <option value="occupied">Ocupada</option>
+                            <option value="reserved">Reservada</option>
+                            <option value="cleaning">Limpeza</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observação</label>
+                        <textarea class="form-textarea" id="tableObservation" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelTableBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveTableBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Details Modal -->
+    <div class="modal-overlay" id="tableDetailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="detailsTitle">Detalhes da Mesa</h2>
+                <button class="modal-close" id="closeDetailsModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="tableDetailsContent">
+                    <!-- Details will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeDetailsBtn">Fechar</button>
+                <button class="btn btn-primary" id="changeStatusBtn">Alterar Status</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../services/auth.js"></script>
+    <script src="../../services/storage.js"></script>
+    <script src="../../services/notifications.js"></script>
+    <script>
+        // Check authentication
+        if (!authService.isAuthenticated()) {
+            window.location.href = '../login/index.html';
+        }
+
+        // Load user info
+        const user = authService.getCurrentUser();
+        if (user) {
+            document.getElementById('userAvatar').textContent = user.avatar || 'AU';
+            document.getElementById('userName').textContent = user.name || 'Admin User';
+            document.getElementById('navUserAvatar').textContent = user.avatar || 'AU';
+            document.getElementById('navUserName').textContent = user.name || 'Admin User';
+        }
+
+        // Mock tables data
+        let tables = [
+            { id: 1, number: 1, seats: 4, status: 'free', observation: '' },
+            { id: 2, number: 2, seats: 4, status: 'occupied', observation: 'Cliente: João Silva' },
+            { id: 3, number: 3, seats: 2, status: 'free', observation: '' },
+            { id: 4, number: 4, seats: 6, status: 'reserved', observation: 'Reserva: 19:00 - Maria Santos' },
+            { id: 5, number: 5, seats: 4, status: 'free', observation: '' },
+            { id: 6, number: 6, seats: 8, status: 'occupied', observation: 'Cliente: Grupo corporativo' },
+            { id: 7, number: 7, seats: 4, status: 'cleaning', observation: '' },
+            { id: 8, number: 8, seats: 2, status: 'free', observation: '' },
+            { id: 9, number: 9, seats: 4, status: 'free', observation: '' },
+            { id: 10, number: 10, seats: 6, status: 'reserved', observation: 'Reserva: 20:00 - Pedro Costa' },
+            { id: 11, number: 11, seats: 4, status: 'free', observation: '' },
+            { id: 12, number: 12, seats: 2, status: 'occupied', observation: 'Cliente: Ana Paula' }
+        ];
+
+        let editingTableId = null;
+        let selectedTableId = null;
+
+        const statusLabels = {
+            free: 'Livre',
+            occupied: 'Ocupada',
+            reserved: 'Reservada',
+            cleaning: 'Limpeza'
+        };
+
+        // Render tables grid
+        function renderTables() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = tables.map(table => `
+                <div class="table-card ${table.status}" onclick="showTableDetails(${table.id})">
+                    <div class="table-card-icon">${table.number}</div>
+                    <div class="table-card-number">Mesa ${table.number}</div>
+                    <div class="table-card-status">${statusLabels[table.status]}</div>
+                    <div class="table-card-seats">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        ${table.seats} lugares
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+        function openTableModal() {
+            document.getElementById('tableModal').classList.add('open');
+            document.getElementById('modalTitle').textContent = 'Nova Mesa';
+            document.getElementById('tableForm').reset();
+            editingTableId = null;
+        }
+
+        function closeTableModal() {
+            document.getElementById('tableModal').classList.remove('open');
+        }
+
+        function showTableDetails(id) {
+            selectedTableId = id;
+            const table = tables.find(t => t.id === id);
+            if (table) {
+                document.getElementById('detailsTitle').textContent = `Mesa ${table.number}`;
+                document.getElementById('tableDetailsContent').innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Número</label>
+                        <div class="form-input" style="background: var(--bg-hover);">${table.number}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lugares</label>
+                        <div class="form-input" style="background: var(--bg-hover);">${table.seats}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <div class="form-input" style="background: var(--bg-hover);">${statusLabels[table.status]}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observação</label>
+                        <div class="form-input" style="background: var(--bg-hover); min-height: 60px;">${table.observation || '-'}</div>
+                    </div>
+                `;
+                document.getElementById('tableDetailsModal').classList.add('open');
+            }
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('tableDetailsModal').classList.remove('open');
+            selectedTableId = null;
+        }
+
+        // Event listeners
+        document.getElementById('addTableBtn').addEventListener('click', openTableModal);
+        document.getElementById('closeTableModal').addEventListener('click', closeTableModal);
+        document.getElementById('cancelTableBtn').addEventListener('click', closeTableModal);
+        document.getElementById('closeDetailsModal').addEventListener('click', closeDetailsModal);
+        document.getElementById('closeDetailsBtn').addEventListener('click', closeDetailsModal);
+
+        document.getElementById('saveTableBtn').addEventListener('click', () => {
+            const number = parseInt(document.getElementById('tableNumber').value);
+            const seats = parseInt(document.getElementById('tableSeats').value);
+            const status = document.getElementById('tableStatus').value;
+            const observation = document.getElementById('tableObservation').value;
+
+            if (editingTableId) {
+                const index = tables.findIndex(t => t.id === editingTableId);
+                if (index !== -1) {
+                    tables[index] = { ...tables[index], number, seats, status, observation };
+                    notificationsService.success('Mesa atualizada com sucesso!');
+                }
+            } else {
+                const newTable = {
+                    id: Math.max(...tables.map(t => t.id)) + 1,
+                    number,
+                    seats,
+                    status,
+                    observation
+                };
+                tables.push(newTable);
+                notificationsService.success('Mesa cadastrada com sucesso!');
+            }
+
+            renderTables();
+            closeTableModal();
+        });
+
+        document.getElementById('changeStatusBtn').addEventListener('click', () => {
+            if (selectedTableId) {
+                const table = tables.find(t => t.id === selectedTableId);
+                if (table) {
+                    const statuses = ['free', 'occupied', 'reserved', 'cleaning'];
+                    const currentIndex = statuses.indexOf(table.status);
+                    const nextIndex = (currentIndex + 1) % statuses.length;
+                    table.status = statuses[nextIndex];
+                    renderTables();
+                    notificationsService.success(`Status alterado para ${statusLabels[table.status]}`);
+                    closeDetailsModal();
+                }
+            }
+        });
+
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const menuBtn = document.getElementById('menuBtn');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        menuBtn.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('open');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = storageService.get('theme', 'dark');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            storageService.set('theme', newTheme);
+            location.reload();
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await authService.logout();
+            window.location.href = '../login/index.html';
+        });
+
+        // Initial render
+        renderTables();
+    </script>
+</body>
+</html>

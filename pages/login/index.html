@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ERP Restaurant</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components/modals.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.5s ease;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: var(--primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-remember input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .login-remember label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .login-footer a {
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .login-divider span {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .login-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">ERP</div>
+                <h1 class="login-title">Bem-vindo de volta</h1>
+                <p class="login-subtitle">Entre com suas credenciais para acessar o sistema</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label required">E-mail</label>
+                    <input 
+                        type="email" 
+                        class="form-input" 
+                        id="email" 
+                        placeholder="seu@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Senha</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password" 
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <div class="login-remember">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Lembrar-me</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                    <span>Entrar</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="#">Esqueceu sua senha?</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../services/auth.js"></script>
+    <script src="../../services/notifications.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const result = await authService.login(email, password);
+                
+                if (result.success) {
+                    notificationsService.success('Login realizado com sucesso!');
+                    
+                    setTimeout(() => {
+                        window.location.href = '../dashboard/index.html';
+                    }, 1000);
+                }
+            } catch (error) {
+                notificationsService.error('Credenciais inválidas. Tente novamente.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Entrar</span>';
+            }
+        });
+
+        // Check if already logged in
+        if (authService.isAuthenticated()) {
+            window.location.href = '../dashboard/index.html';
+        }
+    </script>
+</body>
+</html>
