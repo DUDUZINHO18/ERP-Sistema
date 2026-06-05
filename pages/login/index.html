@@ -1,214 +1,402 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ERP Restaurant</title>
-    <link rel="stylesheet" href="../../assets/css/variables.css">
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/components/modals.css">
+    <title>CorelSys - Login</title>
+
     <style>
-        .login-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+            
+        }
+
+        :root {
+            --bg: #071F45;
+            --primary: #0F4C81;
+            --primary-dark: #0B3A61;
+            --circle-big: #1E88E5;
+            --circle-small: #0D47A1;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #64748B;
+            --border: #C9D2DC;
+
+        }
+
+        body {
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 24px;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            align-items: center;
+            background: linear-gradient(90deg, #07152D, #102B57, #07152D);
+
         }
+
+        /* CARD */
 
         .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xl);
-            padding: 48px;
-            max-width: 420px;
+            position: relative;
+            width: 560px;
+            height: 320px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
+
+        }
+
+        .bottom-image {
+            position: absolute;
+            left: 0;
+            bottom: 0;
             width: 100%;
-            box-shadow: var(--shadow-xl);
-            animation: slideUp 0.5s ease;
+            max-height: 220px;
+            object-fit: cover;
+            opacity: .9;
+            pointer-events: none;
+            z-index: 1;
+
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 32px;
+        /* ESQUERDA */
+
+        .left {
+            width: 230px;
+            position: relative;
+            z-index: 2;
+
         }
 
-        .login-logo {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
+        .logo {
+            width: 120px;
+            height: 45px;
             background: var(--primary);
-            border-radius: var(--radius-lg);
+            color: white;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            color: #FFFFFF;
+            margin-bottom: 25px;
+
         }
 
-        .login-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
+        .logo span {
+            transform: translateY(-1px);
         }
 
-        .login-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
+        h1 {
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 15px;
+
         }
 
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .login-remember {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .login-remember input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .login-remember label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-
-        .login-footer {
-            margin-top: 24px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        .login-footer a {
-            font-size: 14px;
-            color: var(--primary);
-        }
-
-        .login-divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .login-divider::before,
-        .login-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .login-divider span {
+        .info {
             font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
+            color: #6B7280;
+            line-height: 1.5;
+
         }
 
-        @media (max-width: 480px) {
+        .info strong {
+            display: block;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 600;
+
+        }
+
+        /* DIREITA */
+
+        .right {
+            width: 220px;
+            position: relative;
+            z-index: 2;
+
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #374151;
+
+        }
+
+        input[type=email],
+        input[type=password] {
+            width: 100%;
+            height: 25px;
+            border: 1px solid var(--border);
+            outline: none;
+            border-radius: 4px;
+            padding: 0 8px;
+            font-size: 12px;
+
+        }
+
+        input[type=email]:focus,
+        input[type=password]:focus {
+            border-color: var(--primary);
+
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 6px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            color: #6B7280;
+
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+
+        }
+
+        .btn {
+            width: 110px;
+            height: 26px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: .2s;
+
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: rgb(255, 255, 255);
+
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+
+        }
+
+        .btn-secondary {
+            background: #D8D8D8;
+            color: #333;
+
+        }
+
+        .btn-secondary:hover {
+            background: #C7C7C7;
+
+        }
+
+        /* LICENÇA */
+
+        .license {
+            position: absolute;
+            right: 25px;
+            bottom: 45px;
+            font-size: 11px;
+            color: #555;
+            text-align: left;
+            line-height: 1.4;
+
+        }
+
+        .license strong {
+            display: block;
+            margin-top: 3px;
+            color: #222;
+
+        }
+
+        /* COPYRIGHT */
+
+        .footer {
+            position: absolute;
+            right: 25px;
+            bottom: 18px;
+            font-size: 10px;
+            color: #777;
+
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+
+        }
+
+        /* RESPONSIVO */
+
+        @media(max-width:650px) {
             .login-card {
-                padding: 32px 24px;
+                width: 95%;
+                height: auto;
+                flex-direction: column;
+                gap: 25px;
+                padding: 25px;
+
             }
 
-            .login-title {
-                font-size: 24px;
+            .left,
+            .right {
+                width: 100%;
+
             }
+
+            .license,
+            .footer {
+                position: static;
+                margin-top: 15px;
+
+            }
+
         }
+
+        .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
     </style>
 </head>
+
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="login-logo">ERP</div>
-                <h1 class="login-title">Bem-vindo de volta</h1>
-                <p class="login-subtitle">Entre com suas credenciais para acessar o sistema</p>
+    <div class="login-card">
+        <div class="left">
+            <div class="logo">
+                <span>CorelSys</span>
             </div>
+            <h1>ERP_Empresarial</h1>
+            <div class="info">
+                Software licenciado para:
+                <strong>Empresa Cliente</strong>
+            </div>
+        </div>
 
-            <form class="login-form" id="loginForm">
+        <img src="/assets/img/login.png" alt="Ilustração ERP" class="bottom-image">
+
+        <div class="right">
+
+            <form id="loginForm">
+
                 <div class="form-group">
-                    <label class="form-label required">E-mail</label>
-                    <input 
-                        type="email" 
-                        class="form-input" 
-                        id="email" 
-                        placeholder="seu@email.com"
-                        required
-                    >
+                    <label>Usuário:</label>
+
+                    <input type="email" id="text" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label required">Senha</label>
-                    <input 
-                        type="password" 
-                        class="form-input" 
-                        id="password" 
-                        placeholder="••••••••"
-                        required
-                    >
+                    <label>Senha:</label>
+
+                    <input type="password" id="senha" required>
                 </div>
 
-                <div class="login-remember">
+                <div class="remember">
+
                     <input type="checkbox" id="remember">
-                    <label for="remember">Lembrar-me</label>
+
+                    <label for="remember" style="margin:0;">
+                        Lembrar-me
+                    </label>
+
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
-                    <span>Entrar</span>
-                </button>
-            </form>
+                <div class="actions">
 
-            <div class="login-footer">
-                <a href="#">Esqueceu sua senha?</a>
-            </div>
+                    <button type="submit" class="btn btn-primary">
+                        Entrar
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="limparCampos()">
+                        Fechar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="../../services/auth.js"></script>
-    <script src="../../services/notifications.js"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<span class="spinner"></span>';
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            try {
-                const result = await authService.login(email, password);
-                
-                if (result.success) {
-                    notificationsService.success('Login realizado com sucesso!');
-                    
-                    setTimeout(() => {
-                        window.location.href = '../dashboard/index.html';
-                    }, 1000);
-                }
-            } catch (error) {
-                notificationsService.error('Credenciais inválidas. Tente novamente.');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = '<span>Entrar</span>';
-            }
-        });
+    const email = document.getElementById('text').value;
+    const password = document.getElementById('senha').value;
 
-        // Check if already logged in
-        if (authService.isAuthenticated()) {
-            window.location.href = '../dashboard/index.html';
+    const loginBtn = document.querySelector('.btn-primary');
+
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+        const result = await authService.login(email, password);
+
+        if (result.success) {
+
+            notificationsService.success(
+                'Login realizado com sucesso!'
+            );
+
+            setTimeout(() => {
+                window.location.href =
+                    '../dashboard/index.html';
+            }, 1000);
+
+        } else {
+            throw new Error();
         }
-    </script>
+
+    } catch (error) {
+
+        notificationsService.error(
+            'Credenciais inválidas. Tente novamente.'
+        );
+
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span>Entrar</span>';
+    }
+});
+
+// Verifica se já está logado
+if (
+    typeof authService !== 'undefined' &&
+    authService.isAuthenticated()
+) {
+    window.location.href = '../dashboard/index.html';
+}
+</script>
+
 </body>
+
 </html>
